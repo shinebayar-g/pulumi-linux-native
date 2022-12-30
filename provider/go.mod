@@ -1,4 +1,4 @@
-module github.com/shinebayar-g/pulumi-linux/provider
+module github.com/shinebayar-g/pulumi-linux-native/provider
 
 go 1.18
 

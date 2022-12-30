@@ -1,10 +1,10 @@
-PROJECT_NAME := Pulumi Xyz Resource Provider
+PROJECT_NAME := Pulumi Linux Resource Provider
 
-PACK             := xyz
+PACK             := linux
 PACKDIR          := sdk
-PROJECT          := github.com/pulumi/pulumi-xyz
-NODE_MODULE_NAME := @pulumi/xyz
-NUGET_PKG_NAME   := Pulumi.Xyz
+PROJECT          := github.com/shinebayar-g/pulumi-linux-native
+NODE_MODULE_NAME := @shinebayar-g/pulumi-linux-native
+# NUGET_PKG_NAME   := Shinebayar.Pulumi-Linux
 
 PROVIDER        := pulumi-resource-${PACK}
 VERSION         ?= $(shell pulumictl get version)
@@ -67,7 +67,7 @@ python_sdk::
 		cd ./bin && python3 setup.py build sdist
 
 .PHONY: build
-build:: provider go_sdk nodejs_sdk
+build:: provider nodejs_sdk
 # build:: provider dotnet_sdk go_sdk nodejs_sdk python_sdk
 
 # Required for the codegen action that runs in pulumi/pulumi
@@ -80,7 +80,7 @@ lint::
 
 # install:: install_nodejs_sdk install_dotnet_sdk
 install:: install_nodejs_sdk
-	cp $(WORKING_DIR)/bin/${PROVIDER} ${GOPATH}/bin
+# cp $(WORKING_DIR)/bin/${PROVIDER} ${GOPATH}/bin
 
 
 GO_TEST 	 := go test -v -count=1 -cover -timeout 2h -parallel ${TESTPARALLELISM}

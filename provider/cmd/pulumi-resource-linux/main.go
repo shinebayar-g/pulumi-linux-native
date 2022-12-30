@@ -1,23 +1,19 @@
 package main
 
 import (
-	"math/rand"
-	"time"
+	"os"
 
 	p "github.com/pulumi/pulumi-go-provider"
 	"github.com/pulumi/pulumi-go-provider/infer"
 )
 
-// Version is initialized by the Go linker to contain the semver of this build.
 var Version string
 
 func main() {
-	p.RunProvider("xyz", Version,
-		// We tell the provider what resources it needs to support.
-		// In this case, a single custom resource.
+	p.RunProvider("linux", Version,
 		infer.Provider(infer.Options{
 			Resources: []infer.InferredResource{
-				infer.Resource[Random, RandomArgs, RandomState](),
+				infer.Resource[File, FileArgs, FileState](),
 			},
 		}))
 }
@@ -32,41 +28,36 @@ func main() {
 // - Delete: Custom logic when the resource is deleted.
 // - Annotate: Describe fields and set defaults for a resource.
 // - WireDependencies: Control how outputs and secrets flows through values.
-type Random struct{}
+type File struct{}
 
 // Each resource has in input struct, defining what arguments it accepts.
-type RandomArgs struct {
+type FileArgs struct {
 	// Fields projected into Pulumi must be public and hava a `pulumi:"..."` tag.
 	// The pulumi tag doesn't need to match the field name, but its generally a
 	// good idea.
-	Length int `pulumi:"length"`
+	Path string `pulumi:"path"`
 }
 
 // Each resource has a state, describing the fields that exist on the created resource.
-type RandomState struct {
+type FileState struct {
 	// It is generally a good idea to embed args in outputs, but it isn't strictly necessary.
-	RandomArgs
+	FileArgs
 	// Here we define a required output called result.
 	Result string `pulumi:"result"`
 }
 
 // All resources must implement Create at a minumum.
-func (Random) Create(ctx p.Context, name string, input RandomArgs, preview bool) (string, RandomState, error) {
-	state := RandomState{RandomArgs: input}
+func (File) Create(ctx p.Context, name string, input FileArgs, preview bool) (string, FileState, error) {
+	state := FileState{FileArgs: input}
 	if preview {
 		return name, state, nil
 	}
-	state.Result = makeRandom(input.Length)
-	return name, state, nil
+	err := createFile(input.Path)
+	state.Result = "not working"
+	return name, state, err
 }
 
-func makeRandom(length int) string {
-	seededRand := rand.New(rand.NewSource(time.Now().UnixNano()))
-	charset := []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789")
-
-	result := make([]rune, length)
-	for i := range result {
-		result[i] = charset[seededRand.Intn(len(charset))]
-	}
-	return string(result)
+func createFile(path string) error {
+	_, err := os.Create(path)
+	return err
 }

@@ -1,5 +1,7 @@
-import * as xyz from "@pulumi/xyz";
+import * as linux from '@pulumi/linux';
 
-const random = new xyz.Random("my-random", { length: 24 });
+const random = new linux.File('my-file', {
+    path: 'my-file.txt',
+});
 
 export const output = random.result;
